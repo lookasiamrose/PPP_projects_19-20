@@ -1,0 +1,36 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block content %}
+
+{% if user.is_authenticated and user.username == username %}
+
+<h2>{{ username }}</h2>
+
+
+<div class="container" style="text-align: left; min-height: 600px;">
+<div class="row">
+	<div class="col-6 col-sm-4"><h3>Sub-market Currency</h3></div>
+	<div class="col-6 col-sm-3"><h3>Name</h3></div>
+	<div class="col-6 col-sm-2"><h3>Fundusze</h3></div>
+	<div class="col-6 col-sm-3"><h3>Adres</h3></div>
+	<!--<div class="col-12 col-sm-4"></div>-->
+</div>
+{% for wallet in wallets %}
+<div class="row" style="overflow: hidden;">
+	<div class="col-6 col-sm-4"><a href="{% url 'market' wallet.currencyid.name %}" style="margin-right: 25px;">Open</a>  {{wallet.currencyid.shortname}}</div>
+	<div class="col-6 col-sm-3">{{wallet.currencyid.name}}</div>
+	<div class="col-6 col-sm-2">{{wallet.funds|floatformat:8}}</div>
+	<div class="col-6 col-sm-3">{{wallet.address}}</div>
+	<!--<div class="col-12 col-sm-4"></div>-->
+</div>
+{% endfor %}
+</div>
+
+
+{% else %}
+
+<p>Access denied</p>
+
+{% endif %}
+
+{% endblock %}

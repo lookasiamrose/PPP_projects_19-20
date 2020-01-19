@@ -1,0 +1,56 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html>
+<head>
+<title>Gielda kryptowalut</title>
+<link href="//maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css">
+<script src="//cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+<script src="//maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
+<script type="text/javascript" src="https://canvasjs.com/assets/script/jquery.canvasjs.min.js"></script>  
+<link href="{% static "/style.css" %}" rel="stylesheet">
+</head>
+<body>
+<nav>
+	<div class="container" style="text-align: left;">
+	<div class="row">
+		<div class="col-12 col-sm-3">
+		    <a href="/"> Home </a>
+		</div>
+		{% if user.is_authenticated %}
+		<div class="col-12 col-sm-3">
+		    <a href="{% url 'dashboard' user.username %}"> My Dashboard </a>
+		</div>
+		<div class="col-12 col-sm-3">
+		    <a href="{% url 'logout' %}">logout</a>
+		</div>
+		    <!--<a href="/user/{{user.username}}/">
+		    by: {{ user.username }}</a>-->
+		     
+		{% else %}
+		<div class="col-12 col-sm-3">
+		    <a href="{% url 'login' %}">login</a>
+		</div>
+		{% endif %}
+	</div>
+	</div>
+</nav>
+{% block content %}
+{% endblock %}
+<footer>
+	<div class="container">
+		<div class="row">
+			<div class="col-12 col-sm-4">
+				Copyrights @ someone dot com
+			</div>
+			<div class="col-12 col-sm-4">
+				-
+			</div>
+			<div class="col-12 col-sm-4">
+			</div>
+		</div>
+	</div>
+</footer>
+<script src="{% static "/main.js" %}" ></script>
+</body>
+</html>

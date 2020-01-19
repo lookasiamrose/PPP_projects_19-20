@@ -1,0 +1,126 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block content %}
+
+<h1>Cryptocurrency exchange</h1>
+
+<div class="container">
+<div class="row">
+    {% for currency in compound %}
+    <div class="col-12">
+        <div class="row">
+            <div class="col-sm-2"><a href="{% url 'market' currency.name %}" style="margin-right: 25px;">Open market</a></div>
+            <div class="col-sm-2"><h3>{{currency.shortname}}</h3></div>
+            <div class="col-sm-4"><h3>{{currency.name}}</h3></div>
+            <div class="col-sm-4">{% if user.is_authenticated %}Your funds: <span class="funds" style="font-weight: 600">{{currency.wallet|floatformat}}</span>{% endif %}</div>
+        </div>
+    </div>
+    {% if forloop.counter > 1 %}
+    <div class="col-12">
+    <div class="row">
+        <div class="col-6">
+            <div id="graph-{{currency.shortname}}" style="width:100%; height:300px;"></div>
+        </div>
+    </div>
+     <div class="row">
+
+                    <div class="col-sm-6">
+                        <div class="row">
+                            <div class="col-12">Buying:</div>
+                        </div>
+                        <div class="row">
+                        {% for buy in currency.offers.buys %}
+                                    <!--<div class="col-3">{{buy.currencyid.shortname}}</div>-->
+                                    <div class="col-12 col-sm-4" data-id="{{buy.id}}">{{buy.ratetobtc|floatformat:8}}</div>
+                                    <div class="col-12 col-sm-4" data-id="{{buy.id}}">{{buy.quantity|floatformat:8}}</div>
+                                    <div class="col-12 col-sm-4" data-id="{{buy.id}}">{% if user.is_authenticated %}<button id ="offer_button" data-id="{{buy.id}}" class="btn btn-mini btn-danger glyphicon glyphicon-heart" type="button">TAKE</button>{% endif %}</div>
+                        {% empty %}
+                        <div class="col-12">No offers</div>
+                        {% endfor %}
+                        </div>
+                    </div>
+
+                    <div class="col-sm-6">
+                        <div class="row">
+                            <div class="col-12">Selling:</div>
+                        </div>
+                        <div class="row">
+                        {% for sell in currency.offers.sells %}
+                                    <!--<div class="col-3">{{sell.currencyid.shortname}}</div>-->
+                                    <div class="col-12 col-sm-4" data-id="{{sell.id}}">{{sell.ratetobtc|floatformat:8}}</div>
+                                    <div class="col-12 col-sm-4" data-id="{{sell.id}}">{{sell.quantity|floatformat:8}}</div>
+                                    <div class="col-12 col-sm-4" data-id="{{sell.id}}">{% if user.is_authenticated %}<button id ="offer_button" data-id="{{sell.id}}" class="btn btn-mini btn-danger glyphicon glyphicon-heart" type="button">TAKE</button>{% endif %}</div>
+                        {% empty %}
+                        <div class="col-12">No offers</div>
+                        {% endfor %}
+                        </div>
+                    </div>
+    </div>
+    </div>
+    {% endif %}
+    {% endfor %}
+</div>
+<div class="row">
+    <div class="col-12 col-sm-6">
+        {% if user.is_authenticated %}
+        <div class="add-offer-header"><h3>Add your own offer:</h3></div>
+        <form action="add_offer/" method="post" >
+            {% csrf_token %}
+            {{addOffer.as_p}}
+            <input type="submit" value="Submit" />
+        </form>
+        {% endif %}
+    </div>
+    <div class="col-12 col-sm-6">
+        <h3>Last 10 transactions:</h3>
+        {% for offer in closed %}
+        {% if forloop.counter <= 10 %}
+        <div class="row">
+            <div class="col-6 col-sm-3">{{offer.currencyid.shortname}}</div>
+            <div class="col-6 col-sm-3">{{offer.ratetobtc|floatformat:8}}</div>
+            <div class="col-6 col-sm-3">{{offer.quantity}}</div>
+            <div class="col-6 col-sm-3">{{offer.time|time:"H:i:s"}}</div>
+        </div>
+        {% endif %}
+        {% endfor %}
+    </div>
+</div>
+</div>
+<div class="hover_bkgr_fricc">
+    <span class="helper"></span>
+    <div>
+        <div class="popupCloseButton">X</div>
+        <p>Successfully taken!</p>
+    </div>
+</div>
+<script>
+$(function () {
+    {% for currency in compound %}
+    {% if forloop.counter > 1 %}
+    $("#graph-{{currency.shortname}}").CanvasJSChart({ //Pass chart options 
+        axisX:{
+        valueFormatString: "hh DD"
+        },
+        data: [
+        {
+        type: "line", //change it to column, spline, line, pie, etc
+        dataPoints: [
+            {% for close in currency.closed reversed %}
+                {% if forloop.last %}
+                    { x: new Date({{close.time|date:"U"}}*1000), y: {{close.ratetobtc}} }
+                {% else %} 
+                    { x: new Date({{close.time|date:"U"}}*1000), y: {{close.ratetobtc}} },
+                {% endif %}
+            {% empty %}
+                { x: new Date(), y: 0 }
+            {% endfor %}
+        ]
+    }
+    ]
+    });
+    {% endif %}
+    {% endfor %}
+});
+</script>
+
+{% endblock %}

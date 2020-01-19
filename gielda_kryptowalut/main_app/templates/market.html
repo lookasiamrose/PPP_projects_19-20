@@ -1,0 +1,83 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block content %}
+<div class="container" style="text-align: left; min-height: 600px;">
+<div class="row">
+	<div class="col-6"><h3>{{market.shortname}}</h3></div>
+	<div class="col-6"><h3>{{market.name}}</h3></div>
+</div>
+<div class="col-12">
+	<div class="row">
+        <div class="col-12">
+            <div id="graph-{{market.shortname}}" style="width:100%; height:300px;"></div>
+        </div>
+    </div>
+     <div class="row">
+                    <div class="col-sm-6">
+                        <div class="row">
+                            <div class="col-12">Buying:</div>
+                        </div>
+                        <div class="row">
+                        {% for buy in offers.buys %}
+                                    <!--<div class="col-3">{{buy.currencyid.shortname}}</div>-->
+                                    <div class="col-12 col-sm-4" data-id="{{buy.id}}">{{buy.ratetobtc|floatformat:8}}</div>
+                                    <div class="col-12 col-sm-4" data-id="{{buy.id}}">{{buy.quantity|floatformat:8}}</div>
+                                    <div class="col-12 col-sm-4" data-id="{{buy.id}}">{% if user.is_authenticated %}<button id ="offer_button" data-id="{{buy.id}}" class="btn btn-mini btn-danger glyphicon glyphicon-heart" type="button">TAKE</button>{% endif %}</div>
+                        {% empty %}
+                        <div class="col-12">No offers</div>
+                        {% endfor %}
+                        </div>
+                    </div>
+
+                    <div class="col-sm-6">
+                        <div class="row">
+                            <div class="col-12">Selling:</div>
+                        </div>
+                        <div class="row">
+                        {% for sell in offers.sells %}
+                                    <!--<div class="col-3">{{sell.currencyid.shortname}}</div>-->
+                                    <div class="col-12 col-sm-4" data-id="{{sell.id}}">{{sell.ratetobtc|floatformat:8}}</div>
+                                    <div class="col-12 col-sm-4" data-id="{{sell.id}}">{{sell.quantity|floatformat:8}}</div>
+                                    <div class="col-12 col-sm-4" data-id="{{sell.id}}">{% if user.is_authenticated %}<button id ="offer_button" data-id="{{sell.id}}" class="btn btn-mini btn-danger glyphicon glyphicon-heart" type="button">TAKE</button>{% endif %}</div>
+                        {% empty %}
+                        <div class="col-12">No offers</div>
+                        {% endfor %}
+                        </div>
+                    </div>
+    </div>
+    </div>
+</div>
+<div class="hover_bkgr_fricc">
+    <span class="helper"></span>
+    <div>
+        <div class="popupCloseButton">X</div>
+        <p>Successfully taken!</p>
+    </div>
+</div>
+<script>
+$(function () {
+    $("#graph-{{market.shortname}}").CanvasJSChart({ //Pass chart options 
+        axisX:{
+        valueFormatString: "hh DD"
+        },
+        data: [
+        {
+        type: "line", //change it to column, spline, line, pie, etc
+        dataPoints: [
+            {% for close in closed reversed %}
+                {% if forloop.last %}
+                    { x: new Date({{close.time|date:"U"}}*1000), y: {{close.ratetobtc}} }
+                {% else %} 
+                    { x: new Date({{close.time|date:"U"}}*1000), y: {{close.ratetobtc}} },
+                {% endif %}
+            {% empty %}
+                { x: new Date(), y: 0 }
+            {% endfor %}
+        ]
+    }
+    ]
+    });
+});
+</script>
+
+{% endblock %}

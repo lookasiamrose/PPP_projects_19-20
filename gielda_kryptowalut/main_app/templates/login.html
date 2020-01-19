@@ -1,0 +1,21 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block content %}
+<div class="wrapper fadeInDown">
+  <div id="formContent">
+    <!-- Tabs Titles -->
+
+    <!-- Icon -->
+    <div class="fadeIn first">
+      <img src="https://img.icons8.com/clouds/2x/login-rounded-right.png" id="icon" alt="User Icon" />
+    </div>
+
+    <!-- Login Form -->
+    <form method="post" action=".">
+	    {% csrf_token %}
+	    {{form.as_p}}
+	    <input type="submit" class="fadeIn fourth" value="Log In">
+    </form>
+  </div>
+</div>
+{% endblock %}
